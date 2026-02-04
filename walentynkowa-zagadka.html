@@ -1,1 +1,512 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walentynkowa Zagadka ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #f67280 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: #d63447;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .puzzle-container {
+            background: #fff;
+            border: 3px solid #ff6b9d;
+            border-radius: 15px;
+            padding: 30px 20px;
+            margin: 30px 0;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .word {
+            display: inline-flex;
+            gap: 6px;
+            margin: 10px 3px;
+            flex-wrap: nowrap;
+            justify-content: center;
+        }
+
+        .letter {
+            width: 40px;
+            height: 50px;
+            border: 2px solid #ff6b9d;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #d63447;
+            background: linear-gradient(145deg, #ffffff, #fff5f7);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .letter.revealed {
+            background: linear-gradient(145deg, #ffe0e9, #ffd1dc);
+            transform: scale(1.05);
+            animation: revealPulse 0.5s ease;
+        }
+
+        .letter.space {
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            width: 20px;
+        }
+
+        @keyframes revealPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .controls {
+            margin: 30px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b9d, #d63447);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(214, 52, 71, 0.3);
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(214, 52, 71, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: linear-gradient(135deg, #ccc, #999);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .guess-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px dashed #ff6b9d;
+        }
+
+        .guess-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #ff6b9d;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: 'Georgia', serif;
+        }
+
+        .guess-input:focus {
+            outline: none;
+            border-color: #d63447;
+            box-shadow: 0 0 0 3px rgba(214, 52, 71, 0.1);
+        }
+
+        .info {
+            color: #666;
+            font-size: 0.95em;
+            margin: 15px 0;
+            padding: 12px;
+            background: #fff5f7;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b9d;
+        }
+
+        .success-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(214, 52, 71, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .success-content {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            position: relative;
+        }
+
+        .success-content h2 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            animation: fadeInScale 0.8s ease;
+        }
+
+        .success-content p {
+            font-size: 1.8em;
+            animation: fadeInScale 1s ease 0.3s backwards;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .heart {
+            position: fixed;
+            font-size: 30px;
+            color: #fff;
+            animation: floatHeart 4s ease-in forwards;
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .revealed-count {
+            font-size: 1em;
+            color: #d63447;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .word {
+                gap: 4px;
+                margin: 8px 2px;
+            }
+            
+            .letter {
+                width: 28px;
+                height: 38px;
+                font-size: 1.2em;
+                border-width: 1.5px;
+            }
+            
+            .puzzle-container {
+                padding: 20px 10px;
+            }
+            
+            .success-content h2 {
+                font-size: 2.5em;
+            }
+            
+            .success-content p {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .word {
+                gap: 3px;
+                margin: 6px 1px;
+            }
+            
+            .letter {
+                width: 26px;
+                height: 36px;
+                font-size: 1.1em;
+            }
+            
+            .puzzle-container {
+                padding: 15px 5px;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .letter {
+                width: 24px;
+                height: 34px;
+                font-size: 1em;
+            }
+            
+            .word {
+                gap: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💝 Walentynkowa Zagadka 💝</h1>
+        <p class="subtitle">Każdego dnia możesz odkryć jedną literę...</p>
+        
+        <div class="puzzle-container" id="puzzle"></div>
+        
+        <div class="revealed-count" id="revealedCount"></div>
+        
+        <div class="controls">
+            <button class="btn" id="revealBtn" onclick="revealLetter()">
+                🎲 Odkryj Literę
+            </button>
+        </div>
+        
+        <div class="info" id="info">
+            Kliknij przycisk, aby odkryć losową literę!
+        </div>
+        
+        <div class="guess-section">
+            <h3 style="color: #d63447; margin-bottom: 15px;">Znasz już hasło?</h3>
+            <input 
+                type="text" 
+                class="guess-input" 
+                id="guessInput" 
+                placeholder="Wpisz hasło tutaj..."
+                onkeypress="if(event.key === 'Enter') checkGuess()"
+            >
+            <button class="btn" onclick="checkGuess()">
+                ✨ Sprawdź Hasło
+            </button>
+        </div>
+    </div>
+
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <h2>🎉 Gratulacje! 🎉</h2>
+            <p>Wygrałaś i zostałaś Walentynką! ❤️</p>
+        </div>
+    </div>
+
+    <script>
+        const SECRET_PHRASE = "WIENIAWA I WICHROWE WZGÓRZA";
+        const STORAGE_KEY = 'valentineGame';
+        
+        let gameState = {
+            revealedIndices: [],
+            lastRevealDate: null
+        };
+
+        // Load game state
+        function loadGameState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                gameState = JSON.parse(saved);
+            }
+        }
+
+        // Save game state
+        function saveGameState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+        }
+
+        // Check if can reveal today
+        function canRevealToday() {
+            if (!gameState.lastRevealDate) return true;
+            
+            const lastDate = new Date(gameState.lastRevealDate);
+            const today = new Date();
+            
+            return lastDate.toDateString() !== today.toDateString();
+        }
+
+        // Initialize puzzle display
+        function initPuzzle() {
+            const puzzleDiv = document.getElementById('puzzle');
+            puzzleDiv.innerHTML = '';
+            
+            const words = SECRET_PHRASE.split(' ');
+            
+            words.forEach((word, wordIndex) => {
+                const wordDiv = document.createElement('div');
+                wordDiv.className = 'word';
+                
+                for (let i = 0; i < word.length; i++) {
+                    const letterDiv = document.createElement('div');
+                    letterDiv.className = 'letter';
+                    
+                    const globalIndex = SECRET_PHRASE.indexOf(word) + i;
+                    
+                    if (gameState.revealedIndices.includes(globalIndex)) {
+                        letterDiv.textContent = SECRET_PHRASE[globalIndex];
+                        letterDiv.classList.add('revealed');
+                    } else {
+                        letterDiv.textContent = '?';
+                    }
+                    
+                    wordDiv.appendChild(letterDiv);
+                }
+                
+                puzzleDiv.appendChild(wordDiv);
+                
+                // Add space between words except after last word
+                if (wordIndex < words.length - 1) {
+                    const spaceDiv = document.createElement('div');
+                    spaceDiv.className = 'letter space';
+                    puzzleDiv.appendChild(spaceDiv);
+                }
+            });
+            
+            updateRevealedCount();
+            updateUI();
+        }
+
+        // Update revealed count
+        function updateRevealedCount() {
+            const totalLetters = SECRET_PHRASE.replace(/ /g, '').length;
+            const revealed = gameState.revealedIndices.length;
+            document.getElementById('revealedCount').textContent = 
+                `Odkryte litery: ${revealed} / ${totalLetters}`;
+        }
+
+        // Update UI based on state
+        function updateUI() {
+            const revealBtn = document.getElementById('revealBtn');
+            const infoDiv = document.getElementById('info');
+            
+            if (!canRevealToday()) {
+                revealBtn.disabled = true;
+                infoDiv.textContent = '⏰ Już odkryłaś dzisiaj literę! Wróć jutro po kolejną.';
+                infoDiv.style.background = '#fff5e6';
+                infoDiv.style.borderLeftColor = '#ffa726';
+            } else {
+                revealBtn.disabled = false;
+                infoDiv.textContent = '🎲 Możesz odkryć dzisiaj literę!';
+                infoDiv.style.background = '#fff5f7';
+                infoDiv.style.borderLeftColor = '#ff6b9d';
+            }
+        }
+
+        // Reveal a random letter
+        function revealLetter() {
+            if (!canRevealToday()) {
+                alert('Już odkryłaś dzisiaj literę! Wróć jutro! 😊');
+                return;
+            }
+            
+            // Get all unrevealed letter indices (excluding spaces)
+            const unrevealedIndices = [];
+            for (let i = 0; i < SECRET_PHRASE.length; i++) {
+                if (SECRET_PHRASE[i] !== ' ' && !gameState.revealedIndices.includes(i)) {
+                    unrevealedIndices.push(i);
+                }
+            }
+            
+            if (unrevealedIndices.length === 0) {
+                alert('Wszystkie litery zostały już odkryte! 🎉');
+                return;
+            }
+            
+            // Pick random unrevealed letter
+            const randomIndex = unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
+            gameState.revealedIndices.push(randomIndex);
+            gameState.lastRevealDate = new Date().toISOString();
+            
+            saveGameState();
+            initPuzzle();
+        }
+
+        // Check the guess
+        function checkGuess() {
+            const guess = document.getElementById('guessInput').value.trim().toUpperCase();
+            
+            if (guess === SECRET_PHRASE) {
+                showSuccess();
+            } else {
+                alert('Niestety, to nie jest prawidłowe hasło. Spróbuj ponownie! 💕');
+            }
+        }
+
+        // Show success animation
+        function showSuccess() {
+            const overlay = document.getElementById('successOverlay');
+            overlay.style.display = 'flex';
+            
+            // Create hearts
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => createHeart(), i * 100);
+            }
+        }
+
+        // Create floating heart
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = ['❤️', '💕', '💖', '💗', '💝'][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+            
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 5000);
+        }
+
+        // Initialize on load
+        loadGameState();
+        initPuzzle();
+    </script>
+</body>
+</html>
